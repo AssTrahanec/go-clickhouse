@@ -1,0 +1,99 @@
+basePath: /
+definitions:
+  go_clickhouse.Event:
+    properties:
+      eventTime:
+        type: string
+      eventType:
+        type: string
+      payload:
+        type: string
+      userID:
+        type: integer
+    required:
+    - eventTime
+    - eventType
+    - payload
+    - userID
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server go-clickhouse server.
+  title: go-clickhouse API
+  version: "1.0"
+paths:
+  /api/event:
+    get:
+      consumes:
+      - application/json
+      description: Get events filtered by eventType and time range
+      operationId: get-events
+      parameters:
+      - description: Event Type
+        in: query
+        name: eventType
+        required: true
+        type: string
+      - description: Start Time (in ISO format, e.g., 2024-09-01T00:00:00)
+        in: query
+        name: startTime
+        required: true
+        type: string
+      - description: End Time (in ISO format, e.g., 2024-09-07T23:59:59)
+        in: query
+        name: endTime
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/go_clickhouse.Event'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: getEvents
+    post:
+      consumes:
+      - application/json
+      description: Create a new event
+      operationId: create-event
+      parameters:
+      - description: event info. eventTime (in ISO format, e.g., 2024-09-01T00:00:00Z
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/go_clickhouse.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/go_clickhouse.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: createEvent
+swagger: "2.0"

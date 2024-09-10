@@ -1,0 +1,7 @@
+port: "8080"
+db:
+  username: "user"
+  port: "9000"
+  host: "localhost"
+  dbname: "default"
+  password: "qwerty"

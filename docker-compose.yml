@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: "yandex/clickhouse-server:latest"
+    container_name: go-clickhouse-db
+    environment:
+      - CLICKHOUSE_USER=user
+      - CLICKHOUSE_PASSWORD=qwerty
+      - CLICKHOUSE_DB=default
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    networks:
+      - app-network
+
+  migrate:
+    image: migrate/migrate:latest
+    container_name: migrate
+    depends_on:
+      - clickhouse
+    volumes:
+      - ./schema:/schema
+    entrypoint: ["migrate", "-path", "/schema", "-database", "clickhouse://clickhouse:9000?username=user&password=qwerty&database=default", "up"]
+    networks:
+      - app-network
+
+  backend:
+    build: .
+    container_name: go-clickhouse-backend
+    environment:
+      - DB_SERVER=clickhouse
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    depends_on:
+      - clickhouse
+
+networks:
+  app-network:
+    driver: bridge
